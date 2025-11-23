@@ -25,4 +25,10 @@ public class AnalyticsService {
         return count == 0 ? 0.0 : sum / count;
     }
 
+    public double completionPercent(int studentsEnrolled, int studentsCompletedCourse) {
+        if (studentsEnrolled == 0)
+            return 0.0;
+
+        return (100.0 * studentsCompletedCourse) / studentsEnrolled;
+    }
 }
