@@ -12,9 +12,10 @@ public class Course {
     private int instructorId;
     private List<String> students;
     private List<Lesson> lessons;
-
- 
+    
+    
     private String status; 
+
     private String reviewedBy;
     private String reviewDate;
     private String rejectionReason;

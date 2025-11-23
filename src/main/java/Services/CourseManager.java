@@ -1,30 +1,32 @@
 package Services;
 
 import models.Course;
+import models.QuizAttempt;
 
 import java.util.*;
 
 public class CourseManager {
-    private int generateCourseId(List<Course> courses) {
-        return (int) (Math.random() * 9000) + 1000;
+
+    private String generateCourseId() {
+        return "COURSE_" + System.currentTimeMillis();
     }
 
-    public Course createCourse(String title, String description, int instructorId) {
+    public Course createCourse(String title, String description, String instructorId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
-        int newId = generateCourseId(courses);
+        String newId = generateCourseId();
 
-        Course course = new Course(newId, title, description, instructorId);
+        Course course = new Course(newId, title, description, instructorId, null, null, null, null, null, null, null);
         courses.add(course);
 
         JsonDatabaseManager.writeCourses(courses);
         return course;
     }
 
-    public void updateCourse(int courseId, String newTitle, String newDescription) {
+    public void updateCourse(String courseId, String newTitle, String newDescription) {
         List<Course> courses = JsonDatabaseManager.readCourses();
 
         for (Course c : courses) {
-            if (c.getCourseId() == courseId) {
+            if (Objects.equals(c.getCourseId(), courseId)) {
                 c.setTitle(newTitle);
                 c.setDescription(newDescription);
                 break;
@@ -33,30 +35,26 @@ public class CourseManager {
         JsonDatabaseManager.writeCourses(courses);
     }
 
-    public void deleteCourse(int courseId) {
+    public void deleteCourse(String courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
-
-        courses.removeIf(c -> c.getCourseId() == courseId);
-
+        courses.removeIf(c -> Objects.equals(c.getCourseId(), courseId));
         JsonDatabaseManager.writeCourses(courses);
     }
 
     public Course getCourseById(String courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
-
         for (Course c : courses) {
-            if (c.getCourseId() == courseId)
+            if (Objects.equals(c.getCourseId(), courseId))
                 return c;
         }
         return null;
     }
 
-    public List<Course> getCoursesByInstructor(int instructorId) {
+    public List<Course> getCoursesByInstructor(String instructorId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
         List<Course> result = new ArrayList<>();
-
         for (Course c : courses) {
-            if (c.getInstructorId() == instructorId) {
+            if (Objects.equals(c.getCourseId(), instructorId)) {
                 result.add(c);
             }
         }
@@ -67,36 +65,35 @@ public class CourseManager {
         return JsonDatabaseManager.readCourses();
     }
 
-    public boolean enrollStudentInCourse(String studentId, int courseId) {
+    public boolean enrollStudentInCourse(String studentId, String courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
-          for (Course c : courses) {
-        if (c.getCourseId() == courseId) {
-            if (c.getStudents() == null) {
-                c.setStudents(new ArrayList<>());
-            }
-            if (!c.getStudents().contains(studentId)) {
-                c.getStudents().add(studentId);
-                JsonDatabaseManager.writeCourses(courses);
-                return true;
-            } else {
-                return false;  
+        for (Course c : courses) {
+            if (Objects.equals(c.getCourseId(), courseId)) {
+                if (c.getEnrolledStudents() == null) {
+                    c.setEnrolledStudents(new ArrayList<>());
+                }
+                if (!c.getEnrolledStudents().contains(studentId)) {
+                    c.getEnrolledStudents().add(studentId);
+                    JsonDatabaseManager.writeCourses(courses);
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
-    }
-    return false;
+        return false;
     }
 
     public List<Course> getEnrolledCourses(String studentId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
         List<Course> enrolledCourses = new ArrayList<>();
-
         for (Course c : courses) {
-            if (c.getStudents().contains(studentId)) {
+            if (c.getEnrolledStudents().contains(studentId)) {
                 enrolledCourses.add(c);
             }
         }
         return enrolledCourses;
     }
 
-
 }
+

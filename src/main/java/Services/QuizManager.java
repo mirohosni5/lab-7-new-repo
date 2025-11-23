@@ -3,17 +3,17 @@ package Services;
 import models.*;
 
 public class QuizManager {
-    private final CourseManager courseManager;
+    private final JsonDatabaseManager courseManager;
     private final AnalyticsService analytics;
 
-    public QuizManager(CourseManager courseManager, AnalyticsService analytics) {
+    public QuizManager(JsonDatabaseManager courseManager, AnalyticsService analytics) {
         this.courseManager = courseManager;
         this.analytics = analytics;
     }
 
     public synchronized QuizAttempt submitAttempt(QuizAttempt attempt) {
 
-        Course course = courseManager.getCourseById(attempt.getCourseId());
+        Course course = courseManager.findCourseById(attempt.getCourseId());
         if (course == null)
             throw new RuntimeException("Course not found");
 
@@ -31,5 +31,32 @@ public class QuizManager {
             throw new RuntimeException("Lesson/Quiz not found");
         }
 
+        Quiz quiz = lesson.getQuiz();
+
+        int score = 0;
+        int totalPoints = quiz.totalPoints();
+
+        for (Question q : quiz.getQuestions()) {
+            Integer selected = attempt.getAnswers().get(Integer.parseInt(q.getId())).getSelectedIndex();
+            if (selected != null && selected == q.getCorrectIndex()) {
+                score += q.getPoints();
+            }
+        }
+
+        attempt.setScore(score);
+
+        double percent = (totalPoints == 0) ? 0 : (score * 100.0 / totalPoints);
+        attempt.setPassed(percent >= quiz.getPassPercent());
+
+        courseManager.addQuizAttemptForUser(attempt);
+        courseManager.addQuizAttemptForCourse(attempt);
+
+        if (attempt.isPassed()) {
+            courseManager.markLessonCompletedForUser(attempt.getStudentId(), attempt.getCourseId(), attempt.getLessonId());
+        }
+
+        analytics.recordAttempt(attempt, totalPoints);
+
+        return attempt;
     }
 }
