@@ -31,4 +31,16 @@ public class AnalyticsService {
 
         return (100.0 * studentsCompletedCourse) / studentsEnrolled;
     }
+
+    public List<QuizAttempt> getAttemptsByCourseID(String courseId) {
+        List<QuizAttempt> result = new ArrayList<>();
+        for (QuizAttempt a : allAttempts) {
+            if (a.getCourseId().equals(courseId)) {
+                result.add(a);
+            }
+        }
+        return result;
+    }
+
+
 }
