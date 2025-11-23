@@ -19,4 +19,8 @@ public class Certificate {
         this.studentName = studentName;
         this.courseName = courseName;
     }
+
+    public Certificate(String certificateId, String studentId, String courseId, LocalDate issueDate) {
+        this(certificateId, studentId, courseId, issueDate, null, null);
+    }
 }
