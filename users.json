@@ -1,0 +1,101 @@
+[
+    {
+        "role": "Instructor",
+        "createdCourses": ["6908"],
+        "userId": "11064dab-d629-4bf5-8771-69497ac13c9b",
+        "email": "mirohosni5@gmail.com",
+        "passwordHash": "41fdf3757194e6fc3f85d06815cf6a73e1e2f84bd8fc85d75bb258a59a318d97",
+        "username": "admin"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "b6838660-c428-42a5-8faa-23ea8dd15668",
+        "email": "m@gmail.com",
+        "passwordHash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+        "username": "miro"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "bff360d2-3198-4ba0-b025-e59da7e3b848",
+        "email": "m",
+        "passwordHash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+        "username": "m"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "0ed89b44-e3b6-4159-9a83-88f3f06b7b09",
+        "email": "mmm",
+        "passwordHash": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
+        "username": "mm"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "2e61e9ff-b643-4601-8ae1-b6176ec038d6",
+        "email": "mmmm",
+        "passwordHash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+        "username": "mmm"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "8781eaac-ee5f-4c95-81bc-2b9e23d5cc01",
+        "email": "n",
+        "passwordHash": "62c66a7a5dd70c3146618063c344e531e6d4b59e379808443ce962b3abd63c5a",
+        "username": "m"
+    },
+    {
+        "role": "Student",
+        "enrolledCourses": [],
+        "progress": {},
+        "userId": "1ee940df-98f5-4627-bc54-bc6d47ee4a7b",
+        "email": "b",
+        "passwordHash": "50e721e49c013f00c62cf59f2163542a9d8df02464efeb615d31051b0fddc326",
+        "username": "b"
+    },
+    {
+        "role": "Student",
+        "enrolledCourses": [],
+        "progress": {},
+        "userId": "27e7acdd-3eaa-43ad-be29-bc0d5682d726",
+        "email": "mayar@gmail.com",
+        "passwordHash": "62c66a7a5dd70c3146618063c344e531e6d4b59e379808443ce962b3abd63c5a",
+        "username": "mm"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "a95ffc3a-1b4c-4e5a-9675-1905a670883f",
+        "email": "mayarh@gmail.com",
+        "passwordHash": "62c66a7a5dd70c3146618063c344e531e6d4b59e379808443ce962b3abd63c5a",
+        "username": "mayar"
+    },
+    {
+        "role": "Student",
+        "enrolledCourses": [],
+        "progress": {},
+        "userId": "d30efa75-176c-4536-86aa-ac6354087202",
+        "email": "enjyu@gmail.com",
+        "passwordHash": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "username": "enjy"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "e7f1a9de-5954-4c67-bd82-3041df10a97f",
+        "email": "enjyi@gmail.com",
+        "passwordHash": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+        "username": "enjyi"
+    },
+    {
+        "role": "Instructor",
+        "createdCourses": [],
+        "userId": "998c9cad-b395-44f7-be73-6ef8c005c22b",
+        "email": "instructor@gmail.com",
+        "passwordHash": "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d",
+        "username": "instructor"
+    }
+]
