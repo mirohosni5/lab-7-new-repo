@@ -10,4 +10,6 @@ public class AnalyticsService {
     public void recordAttempt(QuizAttempt attempt, int totalPoints) {
         allAttempts.add(attempt);
     }
+
+    
 }
