@@ -4,13 +4,10 @@
  */
 package frontEnd;
 
+import Services.AuthService;
 import Services.CurrentUser;
-import Services.HashUtil;
-import Services.UserManager;
 import instructorFrontEnd.InstructorDashboardFrame1;
 import javax.swing.JOptionPane;
-import models.Instructor;
-import models.Student;
 import models.User;
 
 /**
@@ -119,49 +116,22 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-         String email = jTextField1.getText().trim();
-    String password = new String(jPasswordField1.getPassword()).trim();
-    if (email.isEmpty() || password.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Enter email and password.");
+        String email=jTextField1.getText().trim();
+        String password = new String(jPasswordField1.getPassword()).trim();
+        AuthService a = new AuthService();
+        User user = a.login(email, password);
+        if (user == null) {
+        JOptionPane.showMessageDialog(this, "Invalid login");
         return;
     }
-
-    UserManager manager = new UserManager();
-    User user = manager.getUserByEmail(email);
-
-    if (user == null) {
-        JOptionPane.showMessageDialog(this, "Email not found.");
-        return;
-    }
-
-    String hash = HashUtil.hashPassword(password);
-
-    if (!hash.equals(user.getPasswordHash())) {
-        JOptionPane.showMessageDialog(this, "Wrong password.");
-        return;
-    }
-
     CurrentUser.user = user;
-
     JOptionPane.showMessageDialog(this, "Login Successful!");
-
-    // normalize role check
-    String role = user.getRole() == null ? "" : user.getRole().trim();
-
-    if (role.equalsIgnoreCase("Student")) {
-        // open student dashboard and close login
-        if (user instanceof Student) {
-            new StudentDashboardFrame((Student) user).setVisible(true);
-        } else {
-            // fallback: open student frame without cast (if your StudentFrame can load by email)
-            new StudentDashboardFrame(null).setVisible(true);
-        }
-        this.dispose();
+    if (user.getRole().equals("Student")) {
+        new StudentDashboardFrame().setVisible(true);
     } else {
-        // instructor (default)
         new InstructorDashboardFrame1().setVisible(true);
-        this.dispose();
     }
+    this.dispose(); 
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
