@@ -5,6 +5,7 @@
 package frontEnd;
 import java.util.List;
 import Services.CourseManager;
+import Services.CurrentUser;
 import models.Course;
 import models.Student;
 /**
@@ -14,15 +15,15 @@ import models.Student;
 public class EnrolledCourses extends javax.swing.JPanel {
     private Student student;
 CourseManager manager=new CourseManager();
-    public EnrolledCourses(Student student) {
-        this.student=student;
+    public EnrolledCourses() {
+        this.student=(Student) CurrentUser.user;
         initComponents();
         LoadEnrolledCourses();
         
     }
   public void LoadEnrolledCourses() {
-     String id = (student.getUserId());
-    List<Course> courses = manager.getEnrolledCourses(Integer.parseInt(id));
+     String id = student.getUserId();
+    List<Course> courses = manager.getEnrolledCourses(id);
     javax.swing.table.DefaultTableModel model =(javax.swing.table.DefaultTableModel) jTable1.getModel();
     model.setRowCount(0);
     for (Course c : courses) {
