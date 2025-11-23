@@ -10,4 +10,13 @@ public class Certificate {
     private String studentName;
     private String courseName;
 
+    public Certificate(String certificateId, String studentId, String courseId,
+                       LocalDate issueDate, String studentName, String courseName) {
+        this.certificateId = certificateId;
+        this.studentId = studentId;
+        this.courseId = courseId;
+        this.issueDate = issueDate;
+        this.studentName = studentName;
+        this.courseName = courseName;
+    }
 }
