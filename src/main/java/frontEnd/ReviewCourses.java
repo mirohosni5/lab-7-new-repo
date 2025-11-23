@@ -35,7 +35,7 @@ public class ReviewCourses extends javax.swing.JPanel {
         model.setRowCount(0);
         List<Course> pending = manager.getPendingCourses();
         for (Course c : pending) {
-            model.addRow(new Object[]{c.getCourseId(),c.getTitle(),c.getDescription(),c.getInstructorId(),c.getApprovalStatus()});
+            model.addRow(new Object[]{c.getCourseId(),c.getTitle(),c.getDescription(),c.getInstructorId(),c.getStatus()});
         }
     }
 
@@ -115,7 +115,7 @@ public class ReviewCourses extends javax.swing.JPanel {
         JOptionPane.showMessageDialog(this, "Please select a course!");
         return;
     }
-    int id = (int) jTable1.getValueAt(row, 0);
+    String id =(String)jTable1.getValueAt(row, 0);
     Course c = manager.getCourseById(id);
     c.setStatus("Rejected");
     manager.updateCourse(c);
