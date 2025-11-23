@@ -31,5 +31,20 @@ public class QuizManager {
             throw new RuntimeException("Lesson/Quiz not found");
         }
 
+        Quiz quiz = lesson.getQuiz();
+
+        int score = 0;
+        int totalPoints = quiz.totalPoints();
+
+        for (Question q : quiz.getQuestions()) {
+            Integer selected = attempt.getAnswers().get(Integer.parseInt(q.getId())).getSelectedIndex();
+            if (selected != null && selected == q.getCorrectIndex()) {
+                score += q.getPoints();
+            }
+        }
+
+        attempt.setScore(score);
+
+
     }
 }
