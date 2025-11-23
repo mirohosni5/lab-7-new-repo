@@ -6,16 +6,20 @@ package frontEnd;
 import java.util.List;
 import Services.CourseManager;
 import models.Course;
+import models.Student;
+import Services.CurrentUser;
 /**
  *
  * @author M
  */
 public class AvailableCourses extends javax.swing.JPanel {
-CourseManager manager=new CourseManager();
+      private Student student;
+      private CourseManager manager=new CourseManager();
     /**
      * Creates new form AvailableCourses
      */
     public AvailableCourses() {
+         this.student=(Student) CurrentUser.user;
         initComponents();
         loadAvailableCourses();
     }
@@ -24,6 +28,8 @@ CourseManager manager=new CourseManager();
     javax.swing.table.DefaultTableModel model =(javax.swing.table.DefaultTableModel) jTable1.getModel();
     model.setRowCount(0);
     for (Course c : courses) {
+          String studentId = student.getUserId();
+        if (!c.getStudents().contains(studentId)) 
         model.addRow(new Object[]{c.getCourseId(),c.getTitle(),c.getDescription(),c.getInstructorId()});
     }
 }
