@@ -41,7 +41,7 @@ public class CourseManager {
         JsonDatabaseManager.writeCourses(courses);
     }
 
-    public Course getCourseById(int courseId) {
+    public Course getCourseById(String courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
 
         for (Course c : courses) {
