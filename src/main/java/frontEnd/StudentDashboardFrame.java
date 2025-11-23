@@ -3,6 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package frontEnd;
+import Services.CurrentUser;
+import java.awt.BorderLayout;
 import models.Student;
 /**
  *
@@ -10,14 +12,11 @@ import models.Student;
  */
 public class StudentDashboardFrame extends javax.swing.JFrame {
     private Student student;
-    public StudentDashboardFrame(Student student) {
+    public StudentDashboardFrame() {
         initComponents();
-        this.student=student;
+         this.student=(Student) CurrentUser.user; 
+         mainPanel.setLayout(new BorderLayout());
     }
-        public StudentDashboardFrame() {
-        initComponents();
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -75,7 +74,7 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 534, Short.MAX_VALUE)
+            .addGap(0, 823, Short.MAX_VALUE)
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -94,8 +93,8 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -111,8 +110,8 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
                 .addComponent(jButton5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton4)
-                .addContainerGap(101, Short.MAX_VALUE))
-            .addComponent(mainPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(281, Short.MAX_VALUE))
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -120,28 +119,28 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         mainPanel.removeAll();
-        mainPanel.add(new EnrolledCourses(student));
+        mainPanel.add(new EnrolledCourses(),BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         mainPanel.removeAll();
-        mainPanel.add(new EnrollinCourse(student));
+        mainPanel.add(new EnrollinCourse(),BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         mainPanel.removeAll();
-        mainPanel.add(new AvailableCourses());
+        mainPanel.add(new AvailableCourses(),BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         mainPanel.removeAll();
-        mainPanel.add(new ViewLessons());
+        mainPanel.add(new ViewLessons(),BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
     }//GEN-LAST:event_jButton5ActionPerformed
