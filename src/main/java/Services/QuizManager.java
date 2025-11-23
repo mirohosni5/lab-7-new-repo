@@ -3,12 +3,11 @@ package Services;
 import models.*;
 
 public class QuizManager {
-    private final JsonDatabaseManager db;
+    private final CourseManager courseManager;
     private final AnalyticsService analytics;
 
-    public QuizManager(JsonDatabaseManager db, AnalyticsService analytics) {
-        this.db = db;
+    public QuizManager(CourseManager courseManager, AnalyticsService analytics) {
+        this.courseManager = courseManager;
         this.analytics = analytics;
     }
-
 }
