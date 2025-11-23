@@ -3,17 +3,17 @@ package Services;
 import models.*;
 
 public class QuizManager {
-    private final CourseManager courseManager;
+    private final JsonDatabaseManager  courseManager;
     private final AnalyticsService analytics;
 
-    public QuizManager(CourseManager courseManager, AnalyticsService analytics) {
+    public QuizManager(JsonDatabaseManager  courseManager, AnalyticsService analytics) {
         this.courseManager = courseManager;
         this.analytics = analytics;
     }
 
     public synchronized QuizAttempt submitAttempt(QuizAttempt attempt) {
 
-        Course course = courseManager.getCourseById(attempt.getCourseId());
+        Course course = courseManager.findCourseById(attempt.getCourseId());
         if (course == null)
             throw new RuntimeException("Course not found");
 

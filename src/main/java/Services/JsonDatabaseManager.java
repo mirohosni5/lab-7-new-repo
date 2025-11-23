@@ -15,8 +15,6 @@ public class JsonDatabaseManager {
     private static final String USERS_FILE = "users.json";
     private static final Gson gson = new Gson();
 
-    // ======== Courses ========
-
     public static List<Course> readCourses() {
         try (FileReader reader = new FileReader(COURSES_FILE)) {
             Type listType = new TypeToken<List<Course>>() {}.getType();
@@ -49,14 +47,12 @@ public class JsonDatabaseManager {
         List<Course> courses = readCourses();
         for (Course c : courses) {
             if (String.valueOf(c.getCourseId()).equals(attempt.getCourseId())) {
-                c.addQuizAttempt(attempt); // لازم تضيفي method في Course: addQuizAttempt
+                c.addQuizAttempt(attempt);
                 break;
             }
         }
         writeCourses(courses);
     }
-
-    // ======== Users ========
 
     public static List<User> readUsers() {
         try (FileReader reader = new FileReader(USERS_FILE)) {
@@ -86,10 +82,10 @@ public class JsonDatabaseManager {
             }
         }
         if (user == null) {
-            user = new User(attempt.getStudentId()); // لازم تضيفي constructor مناسب في User
+            user = new User(attempt.getStudentId());
             users.add(user);
         }
-        user.addQuizAttempt(attempt); // لازم تضيفي method addQuizAttempt في User
+        user.addQuizAttempt(attempt);
         writeUsers(users);
     }
 
@@ -97,11 +93,12 @@ public class JsonDatabaseManager {
         List<User> users = readUsers();
         for (User u : users) {
             if (u.getUserId().equals(studentId)) {
-                u.markLessonCompleted(courseId, lessonId); // لازم تضيفي method markLessonCompleted في User
+                u.markLessonCompleted(courseId, lessonId);
                 break;
             }
         }
         writeUsers(users);
     }
 }
+
 
