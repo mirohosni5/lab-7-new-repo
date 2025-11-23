@@ -296,12 +296,12 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
             return;
         }
 
-        List<Integer> students = c.getStudents();
+        List<String> students = c.getStudents();
         StringBuilder sb = new StringBuilder();
         if (students == null || students.isEmpty()) {
             sb.append("(none)");
         } else {
-            for (Integer s : students) sb.append(s).append("\n");
+            for (String s : students) sb.append(s).append("\n");
         }
 
         JOptionPane.showMessageDialog(this,
