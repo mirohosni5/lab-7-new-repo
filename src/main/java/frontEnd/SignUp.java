@@ -4,18 +4,15 @@
  */
 package frontEnd;
 
-import Services.HashUtil;
-import Services.UserManager;
+import Services.AuthService;
 import javax.swing.JOptionPane;
-import models.Instructor;
-import models.Student;
-import models.User;
 
 /**
  *
  * @author M
  */
 public class SignUp extends javax.swing.JFrame {
+     private AuthService a = new AuthService();
 
     /**
      * Creates new form SignUp
@@ -158,36 +155,16 @@ public class SignUp extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        String userName = jTextField1.getText().trim();
-    String email = jTextField2.getText().trim();
-    String password = jTextField3.getText().trim();
-    String role = jComboBox1.getSelectedItem().toString().trim();
-
-    if (userName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "All fields are required.");
-        return;
-    }
-    String passwordHash = HashUtil.hashPassword(password);
-
-    User user;
-    if (role.equalsIgnoreCase("Student")) {
-        user = new Student(userName, email, passwordHash);
-    } else {
-        user = new Instructor(userName, email, passwordHash);
-    }
-
-    // If your User/Student/Instructor model requires setting role explicitly:
-    // try { user.setRole(role); } catch (Exception ignored) {}
-
-    UserManager manager = new UserManager();
-
-    boolean added = manager.addUser(user);
-
-    if (added) {
+        String email = jTextField2.getText().trim();
+        String password=jTextField3.getText().trim();
+        String role=jComboBox1.getSelectedItem().toString().trim();
+        boolean success = a.signup(userName, email, password, role);
+    if (success) {
         JOptionPane.showMessageDialog(this, "Account Created Successfully!");
         this.dispose();
         new Login().setVisible(true);
     } else {
-        JOptionPane.showMessageDialog(this, "Email already exists!");
+        JOptionPane.showMessageDialog(this, "Failed to create account.");
     }
     }//GEN-LAST:event_jButton1ActionPerformed
 
