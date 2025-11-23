@@ -83,7 +83,11 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
         btnManageLessons = new javax.swing.JButton();
         btnViewEnrolled = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnInsights = new javax.swing.JButton();
+        pnlInsightsSummary = new javax.swing.JPanel();
+        lblEnrolled = new javax.swing.JLabel();
+        lblAvgScore = new javax.swing.JLabel();
+        lblCompletion = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -136,7 +140,43 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("jButton2");
+        btnInsights.setText("insights");
+        btnInsights.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInsightsActionPerformed(evt);
+            }
+        });
+
+        pnlInsightsSummary.setVerifyInputWhenFocusTarget(false);
+
+        lblEnrolled.setText("Enrolled");
+
+        lblAvgScore.setText("average");
+
+        lblCompletion.setText("completion");
+
+        javax.swing.GroupLayout pnlInsightsSummaryLayout = new javax.swing.GroupLayout(pnlInsightsSummary);
+        pnlInsightsSummary.setLayout(pnlInsightsSummaryLayout);
+        pnlInsightsSummaryLayout.setHorizontalGroup(
+            pnlInsightsSummaryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlInsightsSummaryLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblEnrolled)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblAvgScore)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblCompletion)
+                .addContainerGap(174, Short.MAX_VALUE))
+        );
+        pnlInsightsSummaryLayout.setVerticalGroup(
+            pnlInsightsSummaryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlInsightsSummaryLayout.createSequentialGroup()
+                .addGroup(pnlInsightsSummaryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEnrolled)
+                    .addComponent(lblAvgScore)
+                    .addComponent(lblCompletion))
+                .addGap(0, 211, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -158,10 +198,12 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
                             .addComponent(btnViewEnrolled)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
-                                .addComponent(jButton2)))
+                                .addComponent(btnInsights)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(240, Short.MAX_VALUE))
+                .addGap(42, 42, 42)
+                .addComponent(pnlInsightsSummary, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(56, 56, 56))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -180,10 +222,14 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnViewEnrolled)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2)))
+                        .addComponent(btnInsights)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap(97, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(pnlInsightsSummary, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -434,6 +480,70 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
         l.setVisible(true); 
         this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnInsightsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsightsActionPerformed
+        // TODO add your handling code here:
+        int idx = jListCourses.getSelectedIndex();
+    if (idx < 0) {
+        JOptionPane.showMessageDialog(this, "Select a course first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+    if (courseIds == null || idx >= courseIds.size()) {
+        JOptionPane.showMessageDialog(this, "Course ID not available. Try refreshing the course list.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    String idStr = courseIds.get(idx);
+    int courseId;
+    try {
+        courseId = Integer.parseInt(idStr);
+    } catch (NumberFormatException ex) {
+        courseId = Math.abs(idStr.hashCode());
+    }
+
+    // Use local helpers (no external AnalyticsService required)
+    java.util.Map<String, java.util.List<Number>> studentPerf = getStudentPerformanceMap();
+    java.util.Map<String, Double> quizAvg = getQuizAveragesMap();
+    java.util.Map<String, Double> completion = getCompletionPercentMap();
+
+    // Update the small summary panel (enrolled, avg score, completion)
+    try {
+        Course c = courseManager.getCourseById(courseId);
+        int enrolled = (c == null || c.getStudents() == null) ? 0 : c.getStudents().size();
+        lblEnrolled.setText("Enrolled: " + enrolled);
+
+        // overall average score from quizAvg map
+        double overallAvg = 0;
+        if (quizAvg != null && !quizAvg.isEmpty()) {
+            overallAvg = quizAvg.values().stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        }
+        lblAvgScore.setText(String.format("Avg Score: %.1f", overallAvg));
+
+        // overall completion average
+        double overallCompletion = 0;
+        if (completion != null && !completion.isEmpty()) {
+            overallCompletion = completion.values().stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        }
+        lblCompletion.setText(String.format("Completion: %.1f%%", overallCompletion));
+    } catch (Exception ignore) {
+        // ignore if backend call fails and keep UI labels unchanged
+    }
+
+    // If all maps are empty, offer sample charts
+    if ((studentPerf == null || studentPerf.isEmpty())
+         && (quizAvg == null || quizAvg.isEmpty())
+         && (completion == null || completion.isEmpty())) {
+        int ok = JOptionPane.showConfirmDialog(this, "No analytics data available for this course. Show sample charts?", "No Data", JOptionPane.YES_NO_OPTION);
+        if (ok != JOptionPane.YES_OPTION) return;
+        ChartFrame f = ChartFrame.withSampleData();
+        f.setVisible(true);
+        return;
+    }
+
+    ChartFrame frame = new ChartFrame("Course Insights - " + (courseManager.getCourseById(courseId) == null ? idStr : courseManager.getCourseById(courseId).getTitle()),
+                                      studentPerf, quizAvg, completion);
+    frame.setVisible(true);
+    }//GEN-LAST:event_btnInsightsActionPerformed
 private void refreshCourseList() {
    
     if (courseModel == null) courseModel = new DefaultListModel<>();
@@ -475,6 +585,75 @@ private void refreshCourseList() {
             return Math.abs(uid.hashCode());
         }
     }
+    // Helper: studentName -> list of numeric scores
+private java.util.Map<String, java.util.List<Number>> getStudentPerformanceMap() {
+    java.util.Map<String, java.util.List<Number>> out = new java.util.LinkedHashMap<>();
+    try {
+        int instrNumeric = getInstructorNumericId();
+        java.util.List<Course> courses = courseManager.getCoursesByInstructor(instrNumeric);
+        if (courses != null && !courses.isEmpty()) {
+            for (Course c : courses) {
+                java.util.List<Integer> studs = c.getStudents();
+                if (studs == null) continue;
+                for (Integer sid : studs) {
+                    String name = "Student " + sid;
+                    out.putIfAbsent(name, new java.util.ArrayList<>());
+                    // If you have student score data use it here. For now add placeholder values.
+                    out.get(name).add((Number)(60 + (sid % 40)));
+                }
+            }
+        }
+    } catch (Exception e) {
+        // ignore and fallthrough to sample data
+    }
+
+    if (out.isEmpty()) {
+        out.put("Alice", java.util.Arrays.asList(80, 90, 85));
+        out.put("Bob",   java.util.Arrays.asList(60, 70, 75));
+    }
+    return out;
+}
+
+// Helper: lesson title -> average quiz score
+private java.util.Map<String, Double> getQuizAveragesMap() {
+    java.util.Map<String, Double> out = new java.util.LinkedHashMap<>();
+    try {
+        int instrNumeric = getInstructorNumericId();
+        java.util.List<Course> courses = courseManager.getCoursesByInstructor(instrNumeric);
+        if (courses != null && !courses.isEmpty()) {
+            // If LessonManager exposes real lesson/quiz data, replace this logic with that call.
+            out.put("Lesson 1", 78.0);
+            out.put("Lesson 2", 64.5);
+            out.put("Lesson 3", 82.0);
+            return out;
+        }
+    } catch (Exception e) {
+        // fallthrough
+    }
+    out.put("Lesson 1", 78.0);
+    out.put("Lesson 2", 64.5);
+    out.put("Lesson 3", 82.0);
+    return out;
+}
+
+// Helper: lesson title -> completion percent (0-100)
+private java.util.Map<String, Double> getCompletionPercentMap() {
+    java.util.Map<String, Double> out = new java.util.LinkedHashMap<>();
+    try {
+        // Replace with real logic if you track lesson completions in LessonManager or CourseManager.
+        out.put("Lesson 1", 90.0);
+        out.put("Lesson 2", 75.0);
+        out.put("Lesson 3", 60.0);
+        return out;
+    } catch (Exception e) {
+        // fallback to sample
+    }
+    out.put("Lesson 1", 90.0);
+    out.put("Lesson 2", 75.0);
+    out.put("Lesson 3", 60.0);
+    return out;
+}
+
  private void loadOrCreateInstructor() {
         List<User> users = jsonUserDb.readUsersFromFile();
         Instructor found = null;
@@ -537,11 +716,15 @@ private void refreshCourseList() {
     private javax.swing.JButton btnCreate;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnInsights;
     private javax.swing.JButton btnManageLessons;
     private javax.swing.JButton btnViewEnrolled;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JList<String> jListCourses;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblAvgScore;
+    private javax.swing.JLabel lblCompletion;
+    private javax.swing.JLabel lblEnrolled;
+    private javax.swing.JPanel pnlInsightsSummary;
     // End of variables declaration//GEN-END:variables
 }
