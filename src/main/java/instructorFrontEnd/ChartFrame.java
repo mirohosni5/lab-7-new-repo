@@ -4,7 +4,7 @@ package instructorFrontEnd;
 // Standalone JFrame that renders analytics charts using JFreeChart.
 // Requires JFreeChart in pom.xml (org.jfree:jfreechart:1.5.3)
 
-import org.jfree.chart.ChartFactory;  
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -139,4 +139,4 @@ public class ChartFrame extends JFrame {
 
         return new ChartFrame("Course Insights", perf, quiz, comp);
     }
-}
+} 
