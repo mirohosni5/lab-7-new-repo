@@ -5,7 +5,10 @@
 package frontEnd;
 
 import Services.CourseManager;
+import Services.CurrentUser;
+import java.util.List;
 import javax.swing.JOptionPane;
+import models.Course;
 import models.Student;
 
 /**
@@ -14,13 +17,35 @@ import models.Student;
  */
 public class EnrollinCourse extends javax.swing.JPanel {
 private Student student;
-CourseManager manager=new CourseManager();
+private CourseManager manager=new CourseManager();
     /**
      * Creates new form EnrollinCourse
      */
-    public EnrollinCourse(Student student) {
-        this.student=student;
+    public EnrollinCourse() {
+        this.student=(Student) CurrentUser.user;
         initComponents();
+          loadCourses();  
+    }
+     private void loadCourses() {
+        jComboBox1.removeAllItems();
+        List<Course> courses = manager.getAllAvailableCourses();
+         String studentId = student.getUserId();
+          System.out.println("Student ID: " + studentId);
+           for (Course c : courses) {
+            if (c.getStudents() == null || !c.getStudents().contains(studentId)) {
+                jComboBox1.addItem(c);
+                System.out.println("Added course: " + c.getTitle());
+            } else {
+                System.out.println("Skipping course (already enrolled): " + c.getTitle());
+            }
+        }
+
+        if (jComboBox1.getItemCount() == 0) {
+            jComboBox1.addItem(new Course(0, "No courses available", "", 0));
+            jComboBox1.setEnabled(false);
+        } else {
+            jComboBox1.setEnabled(true);
+        }
     }
 
     /**
@@ -33,27 +58,23 @@ CourseManager manager=new CourseManager();
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("Enroll in course");
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel2.setText("Enter CourseID:");
-
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton1.setText("Enroll");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
             }
         });
 
@@ -66,59 +87,57 @@ CourseManager manager=new CourseManager();
                 .addComponent(jButton1)
                 .addGap(108, 108, 108))
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap()
+                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(98, 98, 98))))
+                        .addGap(17, 17, 17)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(214, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addComponent(jLabel1)
-                .addGap(25, 25, 25)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(66, 66, 66)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(59, 59, 59)
                 .addComponent(jButton1)
                 .addContainerGap(112, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-         try {
-        int courseId = Integer.parseInt(jTextField1.getText());
-        String id = (student.getUserId());
-        boolean success = manager.enrollStudentInCourse(Integer.parseInt(id), courseId);
-        
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Successfully Enrolled!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Already enrolled or invalid course.");
-        }
+    Course selectedCourse = (Course) jComboBox1.getSelectedItem();
+    if (selectedCourse == null) {
+        JOptionPane.showMessageDialog(this, "Please select a course!");
+        return;
+    }
 
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Invalid Course ID");
+    int courseId = selectedCourse.getCourseId();
+    String studentId = student.getUserId();
+    boolean success = manager.enrollStudentInCourse(studentId, courseId);
+    if (success) {
+        JOptionPane.showMessageDialog(this, "Successfully enrolled in " + selectedCourse.getTitle() + "!");
+        loadCourses();
+    }else if (selectedCourse.getStudents().contains(studentId)) {
+        JOptionPane.showMessageDialog(this, "You are already enrolled in this course.");
+    } else {
+        JOptionPane.showMessageDialog(this, "Enrollment failed.");
     }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<Course> jComboBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
