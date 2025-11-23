@@ -26,8 +26,7 @@ public class AnalyticsService {
     }
 
     public double completionPercent(int studentsEnrolled, int studentsCompletedCourse) {
-        if (studentsEnrolled == 0)
-            return 0.0;
+        if (studentsEnrolled == 0) return 0.0;
 
         return (100.0 * studentsCompletedCourse) / studentsEnrolled;
     }
@@ -42,5 +41,13 @@ public class AnalyticsService {
         return result;
     }
 
-
+    public List<QuizAttempt> getAttemptsByLessonID(String courseId, String lessonId) {
+        List<QuizAttempt> result = new ArrayList<>();
+        for (QuizAttempt a : allAttempts) {
+            if (a.getCourseId().equals(courseId) && a.getLessonId().equals(lessonId)) {
+                result.add(a);
+            }
+        }
+        return result;
+    }
 }
