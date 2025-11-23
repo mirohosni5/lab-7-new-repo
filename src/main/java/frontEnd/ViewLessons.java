@@ -174,8 +174,16 @@ private CourseManager manager=new CourseManager();
             JOptionPane.showMessageDialog(this, "Please select a lesson");
             return;
         }
-        String lessonId = jTable1.getValueAt(row, 0).toString();
-        
+        int lessonId = Integer.parseInt(jTable1.getValueAt(row, 0).toString());
+        Course c = (Course) jComboBox1.getSelectedItem();
+    Lesson lesson = c.getLessons().stream().filter(l -> l.getLessonId() == lessonId).findFirst().orElse(null);
+    if (lesson.getQuiz() == null) {
+        JOptionPane.showMessageDialog(this, "This lesson has no quiz.");
+        return;
+    }
+    Quiz q = new Quiz();
+    q.setVisible(true);
+    this.setVisible(false);
     }//GEN-LAST:event_jButton2ActionPerformed
 
 
