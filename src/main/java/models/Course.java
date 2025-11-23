@@ -13,13 +13,12 @@ public class Course {
     private List<String> students;
     private List<Lesson> lessons;
 
-    // Admin workflow fields
-    private String status; // "PENDING", "APPROVED", "REJECTED"
+ 
+    private String status; 
     private String reviewedBy;
     private String reviewDate;
     private String rejectionReason;
 
-    // Constructor القديم
     public Course(int courseId, String title, String description, int instructorId){
         this.courseId = courseId;
         this.title = title;
@@ -27,10 +26,9 @@ public class Course {
         this.instructorId = instructorId;
         this.students = new ArrayList<>();
         this.lessons = new ArrayList<>();
-        this.status = "PENDING"; // افتراضي جديد
+        this.status = "PENDING";
     }
 
-    // Getters & Setters القديمة
     public int getCourseId() { return courseId; }
     public void setCourseId(int courseId) { this.courseId = courseId; }
 
@@ -49,7 +47,6 @@ public class Course {
     public List<Lesson> getLessons() { return lessons; }
     public void setLessons(List<Lesson> lessons) { this.lessons = lessons; }
 
-    // Admin workflow methods
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
