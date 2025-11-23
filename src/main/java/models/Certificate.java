@@ -71,4 +71,16 @@ public class Certificate {
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
+
+    @Override
+    public String toString() {
+        return "Certificate{" +
+                "certificateId='" + certificateId + '\'' +
+                ", studentId='" + studentId + '\'' +
+                ", courseId='" + courseId + '\'' +
+                ", issueDate=" + issueDate +
+                ", studentName='" + studentName + '\'' +
+                ", courseName='" + courseName + '\'' +
+                '}';
+    }
 }
