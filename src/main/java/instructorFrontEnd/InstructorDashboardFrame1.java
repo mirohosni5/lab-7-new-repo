@@ -83,6 +83,7 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
         btnManageLessons = new javax.swing.JButton();
         btnViewEnrolled = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -135,6 +136,8 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
             }
         });
 
+        jButton2.setText("jButton2");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -152,7 +155,10 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
                                 .addComponent(btnEdit))
                             .addComponent(btnDelete)
                             .addComponent(btnManageLessons)
-                            .addComponent(btnViewEnrolled))
+                            .addComponent(btnViewEnrolled)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(jButton2)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(240, Short.MAX_VALUE))
@@ -162,6 +168,7 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCreate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -171,11 +178,12 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnManageLessons)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnViewEnrolled))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnViewEnrolled)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
-                .addContainerGap(113, Short.MAX_VALUE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
 
         pack();
@@ -288,12 +296,12 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
             return;
         }
 
-        List<Integer> students = c.getStudents();
+        List<String> students = c.getStudents();
         StringBuilder sb = new StringBuilder();
         if (students == null || students.isEmpty()) {
             sb.append("(none)");
         } else {
-            for (Integer s : students) sb.append(s).append("\n");
+            for (String s : students) sb.append(s).append("\n");
         }
 
         JOptionPane.showMessageDialog(this,
@@ -532,6 +540,7 @@ private void refreshCourseList() {
     private javax.swing.JButton btnManageLessons;
     private javax.swing.JButton btnViewEnrolled;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JList<String> jListCourses;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables

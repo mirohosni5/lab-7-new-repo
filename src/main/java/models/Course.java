@@ -8,7 +8,7 @@ public class Course {
     private String title;
     private String description;
     private int instructorId;
-    private List<Integer> students;
+    private List<String> students;
     private List<Lesson> lessons;
 
     public Course(int courseId, String title, String description, int instructorId){
@@ -52,11 +52,11 @@ public class Course {
         this.instructorId = instructorId;
     }
 
-    public List<Integer> getStudents() {
+    public List<String> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Integer> students) {
+    public void setStudents(List<String> students) {
         this.students = students;
     }
 
