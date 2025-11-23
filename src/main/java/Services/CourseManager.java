@@ -26,7 +26,7 @@ public class CourseManager {
         List<Course> courses = JsonDatabaseManager.readCourses();
 
         for (Course c : courses) {
-            if (c.getCourseId().equals(courseId)) {
+            if (Objects.equals(c.getCourseId(), courseId)) {
                 c.setTitle(newTitle);
                 c.setDescription(newDescription);
                 break;
@@ -37,14 +37,14 @@ public class CourseManager {
 
     public void deleteCourse(String courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
-        courses.removeIf(c -> c.getCourseId().equals(courseId));
+        courses.removeIf(c -> Objects.equals(c.getCourseId(), courseId));
         JsonDatabaseManager.writeCourses(courses);
     }
 
     public Course getCourseById(String courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
         for (Course c : courses) {
-            if (c.getCourseId().equals(courseId))
+            if (Objects.equals(c.getCourseId(), courseId))
                 return c;
         }
         return null;
@@ -54,7 +54,7 @@ public class CourseManager {
         List<Course> courses = JsonDatabaseManager.readCourses();
         List<Course> result = new ArrayList<>();
         for (Course c : courses) {
-            if (c.getInstructorId().equals(instructorId)) {
+            if (Objects.equals(c.getCourseId(), instructorId)) {
                 result.add(c);
             }
         }
@@ -68,7 +68,7 @@ public class CourseManager {
     public boolean enrollStudentInCourse(String studentId, String courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
         for (Course c : courses) {
-            if (c.getCourseId().equals(courseId)) {
+            if (Objects.equals(c.getCourseId(), courseId)) {
                 if (c.getEnrolledStudents() == null) {
                     c.setEnrolledStudents(new ArrayList<>());
                 }
