@@ -45,6 +45,7 @@ public class Course {
     public List<String> getStudents() { return students; }
     public void setStudents(List<String> students) { this.students = students; }
 
+    
     public List<Lesson> getLessons() { return lessons; }
     public void setLessons(List<Lesson> lessons) { this.lessons = lessons; }
 
