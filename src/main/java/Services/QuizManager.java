@@ -3,10 +3,10 @@ package Services;
 import models.*;
 
 public class QuizManager {
-    private final JsonDatabaseManager  courseManager;
+    private final JsonDatabaseManager courseManager;
     private final AnalyticsService analytics;
 
-    public QuizManager(JsonDatabaseManager  courseManager, AnalyticsService analytics) {
+    public QuizManager(JsonDatabaseManager courseManager, AnalyticsService analytics) {
         this.courseManager = courseManager;
         this.analytics = analytics;
     }
@@ -51,5 +51,12 @@ public class QuizManager {
         courseManager.addQuizAttemptForUser(attempt);
         courseManager.addQuizAttemptForCourse(attempt);
 
+        if (attempt.isPassed()) {
+            courseManager.markLessonCompletedForUser(attempt.getStudentId(), attempt.getCourseId(), attempt.getLessonId());
+        }
+
+        analytics.recordAttempt(attempt, totalPoints);
+
+        return attempt;
     }
 }
