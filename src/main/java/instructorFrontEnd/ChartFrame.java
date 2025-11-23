@@ -21,10 +21,11 @@ import java.util.Arrays;
 
 public class ChartFrame extends JFrame {
 
-    public ChartFrame(String title,
-                      Map<String, List<Number>> studentPerf,
-                      Map<String, Double> quizAvg,
-                      Map<String, Double> completion) {
+   public ChartFrame(String title,
+                  Map<String, List<Number>> studentPerf,
+                  Map<String, Double> quizAvg,
+                  Map<String, Double> completion)
+ {
 
         super(title);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

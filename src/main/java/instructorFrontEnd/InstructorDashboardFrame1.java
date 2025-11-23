@@ -271,6 +271,48 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
     jListCourses.setSelectedIndex(idx);
     }//GEN-LAST:event_btnEditActionPerformed
 
+    // studentPerf: studentName -> list of scores
+// quizAvg: lesson->avg score
+// completion: lesson->percent (0..100)
+private void updateInsightsSummary(java.util.Map<String, java.util.List<Number>> studentPerf,
+                                   java.util.Map<String, Double> quizAvg,
+                                   java.util.Map<String, Double> completion) {
+    // Enrolled count = number of unique students in studentPerf OR course's student list
+    int enrolled = 0;
+    if (studentPerf != null && !studentPerf.isEmpty()) enrolled = studentPerf.size();
+    else {
+        // fallback: try courseManager for selected course
+        try {
+            int idx = jListCourses.getSelectedIndex();
+            String idStr = courseIds.get(idx);
+            int cId = Integer.parseInt(idStr);
+            models.Course c = courseManager.getCourseById(cId);
+            if (c != null && c.getStudents() != null) enrolled = c.getStudents().size();
+        } catch (Exception ignore) {}
+    }
+
+    // average score: average of quizAvg values
+    double avgScore = 0;
+    if (quizAvg != null && !quizAvg.isEmpty()) {
+        double sum = 0; int n = 0;
+        for (Double v : quizAvg.values()) { sum += v; n++; }
+        avgScore = n == 0 ? 0 : (sum / n);
+    }
+
+    // average completion percent: average of completion values
+    double avgCompletion = 0;
+    if (completion != null && !completion.isEmpty()) {
+        double sum = 0; int n = 0;
+        for (Double v : completion.values()) { sum += v; n++; }
+        avgCompletion = n == 0 ? 0 : (sum / n);
+    }
+
+    // Set labels (format numbers nicely)
+    lblEnrolled.setText("Enrolled: " + enrolled);
+    lblAvgScore.setText(String.format("Avg score: %.1f", avgScore));
+    lblCompletion.setText(String.format("Completion: %.0f%%", avgCompletion));
+}
+
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
        // TODO add your handling code here:
         
@@ -310,6 +352,36 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
 
        
     }//GEN-LAST:event_btnCreateActionPerformed
+// Convert keys that look like numeric lesson IDs to lesson titles using LessonManager.
+// If a key is already a readable title, keep it.
+private java.util.Map<String, Double> mapLessonKeysToTitles(java.util.Map<String, Double> raw) {
+    if (raw == null) return new java.util.LinkedHashMap<>();
+    java.util.Map<String, Double> out = new java.util.LinkedHashMap<>();
+    LessonManager lm = this.lessonManager;
+    for (java.util.Map.Entry<String, Double> e : raw.entrySet()) {
+        String key = e.getKey();
+        String pretty = key;
+        // try numeric id
+        try {
+            int lid = Integer.parseInt(key);
+            try {
+                models.Lesson lesson = lm.getLessonById(lid);
+                if (lesson != null && lesson.getTitle() != null && !lesson.getTitle().isEmpty()) pretty = lesson.getTitle();
+            } catch (Exception ignore) {}
+        } catch (NumberFormatException ignored) {
+            // not numeric, maybe already a title — keep as-is
+            pretty = key;
+        }
+        // ensure unique keys: if duplicate, append suffix
+        String finalKey = pretty;
+        int suffix = 1;
+        while (out.containsKey(finalKey)) {
+            finalKey = pretty + " (" + suffix++ + ")";
+        }
+        out.put(finalKey, e.getValue());
+    }
+    return out;
+}
 
     private void btnViewEnrolledActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewEnrolledActionPerformed
         // TODO add your handling code here:
@@ -483,7 +555,9 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
 
     private void btnInsightsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsightsActionPerformed
         // TODO add your handling code here:
-        int idx = jListCourses.getSelectedIndex();
+                                               
+    // ensure a course is selected
+    int idx = jListCourses.getSelectedIndex();
     if (idx < 0) {
         JOptionPane.showMessageDialog(this, "Select a course first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
         return;
@@ -501,48 +575,46 @@ public class InstructorDashboardFrame1 extends javax.swing.JFrame {
         courseId = Math.abs(idStr.hashCode());
     }
 
-    // Use local helpers (no external AnalyticsService required)
-    java.util.Map<String, java.util.List<Number>> studentPerf = getStudentPerformanceMap();
-    java.util.Map<String, Double> quizAvg = getQuizAveragesMap();
-    java.util.Map<String, Double> completion = getCompletionPercentMap();
+    // 1) Get raw analytics from backend
+    Services.AnalyticsService analytics = new Services.AnalyticsService();
+    java.util.Map<String, java.util.List<Number>> rawStudentPerf = analytics.getStudentPerformanceByStudent(courseId);
+    java.util.Map<String, Double> rawQuizAvg = analytics.getQuizAveragesByLesson(courseId);
+    java.util.Map<String, Double> rawCompletion = analytics.getCompletionPercentByLesson(courseId);
 
-    // Update the small summary panel (enrolled, avg score, completion)
-    try {
-        Course c = courseManager.getCourseById(courseId);
-        int enrolled = (c == null || c.getStudents() == null) ? 0 : c.getStudents().size();
-        lblEnrolled.setText("Enrolled: " + enrolled);
+    // 2) Map lesson ids to titles for quizAvg & completion (if they look like ids)
+    java.util.Map<String, Double> quizAvg = mapLessonKeysToTitles(rawQuizAvg);
+    java.util.Map<String, Double> completion = mapLessonKeysToTitles(rawCompletion);
 
-        // overall average score from quizAvg map
-        double overallAvg = 0;
-        if (quizAvg != null && !quizAvg.isEmpty()) {
-            overallAvg = quizAvg.values().stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-        }
-        lblAvgScore.setText(String.format("Avg Score: %.1f", overallAvg));
+    // 3) Map student perf keys if you want nicer names (optional) — here we keep as-is
+    java.util.Map<String, java.util.List<Number>> studentPerf = rawStudentPerf;
 
-        // overall completion average
-        double overallCompletion = 0;
-        if (completion != null && !completion.isEmpty()) {
-            overallCompletion = completion.values().stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-        }
-        lblCompletion.setText(String.format("Completion: %.1f%%", overallCompletion));
-    } catch (Exception ignore) {
-        // ignore if backend call fails and keep UI labels unchanged
-    }
-
-    // If all maps are empty, offer sample charts
-    if ((studentPerf == null || studentPerf.isEmpty())
-         && (quizAvg == null || quizAvg.isEmpty())
-         && (completion == null || completion.isEmpty())) {
-        int ok = JOptionPane.showConfirmDialog(this, "No analytics data available for this course. Show sample charts?", "No Data", JOptionPane.YES_NO_OPTION);
+    // 4) If nothing returned, show sample data option
+    boolean empty = (studentPerf == null || studentPerf.isEmpty())
+                 && (quizAvg == null || quizAvg.isEmpty())
+                 && (completion == null || completion.isEmpty());
+    if (empty) {
+        int ok = JOptionPane.showConfirmDialog(this,
+            "No analytics data available for this course. Show sample charts?",
+            "No Data", JOptionPane.YES_NO_OPTION);
         if (ok != JOptionPane.YES_OPTION) return;
-        ChartFrame f = ChartFrame.withSampleData();
-        f.setVisible(true);
+        ChartFrame.sampleAndShow(); // convenience method below (or use withSampleData())
         return;
     }
 
-    ChartFrame frame = new ChartFrame("Course Insights - " + (courseManager.getCourseById(courseId) == null ? idStr : courseManager.getCourseById(courseId).getTitle()),
-                                      studentPerf, quizAvg, completion);
+    // 5) Create and show ChartFrame
+    String courseTitle = idStr;
+    try {
+        models.Course c = courseManager.getCourseById(courseId);
+        if (c != null && c.getTitle() != null) courseTitle = c.getTitle();
+    } catch (Exception ignore) {}
+
+    ChartFrame frame = new ChartFrame("Course Insights - " + courseTitle, studentPerf, quizAvg, completion);
     frame.setVisible(true);
+
+    // 6) Update small summary panel on dashboard
+    updateInsightsSummary(studentPerf, quizAvg, completion);
+
+
     }//GEN-LAST:event_btnInsightsActionPerformed
 private void refreshCourseList() {
    
