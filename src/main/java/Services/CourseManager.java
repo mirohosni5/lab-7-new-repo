@@ -67,24 +67,26 @@ public class CourseManager {
         return JsonDatabaseManager.readCourses();
     }
 
-    public boolean enrollStudentInCourse(int studentId, int courseId) {
+    public boolean enrollStudentInCourse(String studentId, int courseId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
-
-        for (Course c : courses) {
-            if (c.getCourseId() == courseId) {
-                if (!c.getStudents().contains(studentId)) {
-                    c.getStudents().add(studentId);
-                    JsonDatabaseManager.writeCourses(courses);
-                    return true;
-                } else {
-                    return false;  //student already  previously registered
-                }
+          for (Course c : courses) {
+        if (c.getCourseId() == courseId) {
+            if (c.getStudents() == null) {
+                c.setStudents(new ArrayList<>());
+            }
+            if (!c.getStudents().contains(studentId)) {
+                c.getStudents().add(studentId);
+                JsonDatabaseManager.writeCourses(courses);
+                return true;
+            } else {
+                return false;  
             }
         }
-        return false;  //if course is not found
+    }
+    return false;
     }
 
-    public List<Course> getEnrolledCourses(int studentId) {
+    public List<Course> getEnrolledCourses(String studentId) {
         List<Course> courses = JsonDatabaseManager.readCourses();
         List<Course> enrolledCourses = new ArrayList<>();
 
