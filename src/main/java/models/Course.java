@@ -5,88 +5,62 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.QuizAttempt;
-
 public class Course {
-    private String courseId;
+    private int courseId;
     private String title;
     private String description;
-    private String instructorId;
+    private int instructorId;
+    private List<String> students;
     private List<Lesson> lessons;
-    private List<String> enrolledStudents;
-    private String status;
-    private String createdDate;
+
+    // Admin workflow fields
+    private String status; // "PENDING", "APPROVED", "REJECTED"
     private String reviewedBy;
     private String reviewDate;
     private String rejectionReason;
-    private List<QuizAttempt> quizAttempts = new ArrayList<>();
 
-    public Course(String title, String description, String instructorId) {
-        this.courseId = generateCourseId();
-        this.title = title;
-        this.description = description;
-        this.instructorId = instructorId;
-        this.lessons = new ArrayList<>();
-        this.enrolledStudents = new ArrayList<>();
-        this.status = "PENDING";
-        this.createdDate = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    }
-
-    public Course(String courseId, String title, String description, String instructorId,
-                  List<Lesson> lessons, List<String> enrolledStudents, String status,
-                  String createdDate, String reviewedBy, String reviewDate, String rejectionReason) {
+    // Constructor القديم
+    public Course(int courseId, String title, String description, int instructorId){
         this.courseId = courseId;
         this.title = title;
         this.description = description;
         this.instructorId = instructorId;
-        this.lessons = lessons != null ? lessons : new ArrayList<>();
-        this.enrolledStudents = enrolledStudents != null ? enrolledStudents : new ArrayList<>();
-        this.status = status != null ? status : "PENDING";
-        this.createdDate = createdDate;
-        this.reviewedBy = reviewedBy;
-        this.reviewDate = reviewDate;
-        this.rejectionReason = rejectionReason;
-        this.quizAttempts = new ArrayList<>();
+        this.students = new ArrayList<>();
+        this.lessons = new ArrayList<>();
+        this.status = "PENDING"; // افتراضي جديد
     }
 
-    private String generateCourseId() {
-        return "COURSE_" + System.currentTimeMillis();
-    }
+    // Getters & Setters القديمة
+    public int getCourseId() { return courseId; }
+    public void setCourseId(int courseId) { this.courseId = courseId; }
 
-    public void addLesson(Lesson lesson) {
-        if (lesson != null && !lessons.contains(lesson)) {
-            lessons.add(lesson);
-        }
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public boolean removeLesson(String lessonId) {
-        return lessons.removeIf(lesson -> String.valueOf(lesson.getLessonId()).equals(String.valueOf(lessonId)));
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public Lesson getLessonById(String lessonId) {
-        for (Lesson lesson : lessons) {
-            if (String.valueOf(lesson.getLessonId()).equals(lessonId)) {
-                return lesson;
-            }
-        }
-        return null;
-    }
+    public int getInstructorId() { return instructorId; }
+    public void setInstructorId(int instructorId) { this.instructorId = instructorId; }
 
-    public boolean enrollStudent(String studentId) {
-        if (!"APPROVED".equals(this.status)) {
-            System.out.println("Cannot enroll: Course is not approved");
-            return false;
-        }
-        if (!enrolledStudents.contains(studentId)) {
-            enrolledStudents.add(studentId);
-            return true;
-        }
-        return false;
-    }
+    public List<String> getStudents() { return students; }
+    public void setStudents(List<String> students) { this.students = students; }
 
-    public boolean unenrollStudent(String studentId) {
-        return enrolledStudents.remove(studentId);
-    }
+    public List<Lesson> getLessons() { return lessons; }
+    public void setLessons(List<Lesson> lessons) { this.lessons = lessons; }
+
+    // Admin workflow methods
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getReviewedBy() { return reviewedBy; }
+    public void setReviewedBy(String reviewedBy) { this.reviewedBy = reviewedBy; }
+
+    public String getReviewDate() { return reviewDate; }
+    public void setReviewDate(String reviewDate) { this.reviewDate = reviewDate; }
+
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 
     public void approveCourse(String adminId) {
         this.status = "APPROVED";
@@ -102,119 +76,29 @@ public class Course {
         this.rejectionReason = reason;
     }
 
-    public boolean isApproved() {
-        return "APPROVED".equals(this.status);
-    }
-
-    public List<QuizAttempt> getQuizAttempts() {
-        return quizAttempts;
-    }
-
-    public void addQuizAttempt(QuizAttempt attempt) {
-        if (quizAttempts == null) {
-            quizAttempts = new ArrayList<>();
+    public boolean enrollStudent(String studentId) {
+        if (!"APPROVED".equals(this.status)) {
+            System.out.println("Cannot enroll: Course is not approved");
+            return false;
         }
-        quizAttempts.add(attempt);
+        if (!students.contains(studentId)) {
+            students.add(studentId);
+            return true;
+        }
+        return false;
     }
 
-    public String getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getInstructorId() {
-        return instructorId;
-    }
-
-    public void setInstructorId(String instructorId) {
-        this.instructorId = instructorId;
-    }
-
-    public List<Lesson> getLessons() {
-        return lessons;
-    }
-
-    public void setLessons(List<Lesson> lessons) {
-        this.lessons = lessons;
-    }
-
-    public List<String> getEnrolledStudents() {
-        return enrolledStudents;
-    }
-
-    public void setEnrolledStudents(List<String> enrolledStudents) {
-        this.enrolledStudents = enrolledStudents;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(String createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public String getReviewedBy() {
-        return reviewedBy;
-    }
-
-    public void setReviewedBy(String reviewedBy) {
-        this.reviewedBy = reviewedBy;
-    }
-
-    public String getReviewDate() {
-        return reviewDate;
-    }
-
-    public void setReviewDate(String reviewDate) {
-        this.reviewDate = reviewDate;
-    }
-
-    public String getRejectionReason() {
-        return rejectionReason;
-    }
-
-    public void setRejectionReason(String rejectionReason) {
-        this.rejectionReason = rejectionReason;
+    public boolean unenrollStudent(String studentId) {
+        return students.remove(studentId);
     }
 
     @Override
     public String toString() {
-        return "Course{" +
-                "courseId='" + courseId + '\'' +
-                ", title='" + title + '\'' +
-                ", instructorId='" + instructorId + '\'' +
-                ", lessons=" + lessons.size() +
-                ", students=" + enrolledStudents.size() +
-                ", quizAttempts=" + quizAttempts.size() +
-                ", status=" + status +
-                '}';
+        return title + " (ID: " + courseId + ", Status: " + status + ")";
     }
+    
+    
+    
 }
+
+
