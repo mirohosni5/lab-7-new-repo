@@ -28,11 +28,12 @@ private CourseManager manager=new CourseManager();
     }
       private void loadStudentCourses() {
         jComboBox1.removeAllItems();
-        List<String> enrolledCourseIds = student.getEnrolledCourses();
-        for (String id : enrolledCourseIds) {
-            Course c = manager.getCourseById(Integer.parseInt(id));
-            if (c != null)
-                jComboBox1.addItem(c);
+        List<Course> enrolledCourses = manager.getEnrolledCourses(student.getUserId());
+         for (Course c : enrolledCourses) {
+            jComboBox1.addItem(c);
+        }
+        if (!enrolledCourses.isEmpty()) {
+            loadLessons(enrolledCourses.get(0));
         }
     }
  private void loadLessons(Course course) {
