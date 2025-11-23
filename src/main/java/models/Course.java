@@ -1,12 +1,11 @@
 package models;
-/**
- *
- * @author Engyz
- */
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import models.QuizAttempt;
 
 public class Course {
     private String courseId;
@@ -15,13 +14,13 @@ public class Course {
     private String instructorId;
     private List<Lesson> lessons;
     private List<String> enrolledStudents;
-    private String status; 
+    private String status;
     private String createdDate;
     private String reviewedBy;
     private String reviewDate;
     private String rejectionReason;
+    private List<QuizAttempt> quizAttempts = new ArrayList<>();
 
-  
     public Course(String title, String description, String instructorId) {
         this.courseId = generateCourseId();
         this.title = title;
@@ -47,6 +46,7 @@ public class Course {
         this.reviewedBy = reviewedBy;
         this.reviewDate = reviewDate;
         this.rejectionReason = rejectionReason;
+        this.quizAttempts = new ArrayList<>();
     }
 
     private String generateCourseId() {
@@ -60,8 +60,16 @@ public class Course {
     }
 
     public boolean removeLesson(String lessonId) {
-        return lessons.removeIf(lesson ->
-                String.valueOf(lesson.getLessonId()).equals(String.valueOf(lessonId)));
+        return lessons.removeIf(lesson -> String.valueOf(lesson.getLessonId()).equals(String.valueOf(lessonId)));
+    }
+
+    public Lesson getLessonById(String lessonId) {
+        for (Lesson lesson : lessons) {
+            if (String.valueOf(lesson.getLessonId()).equals(lessonId)) {
+                return lesson;
+            }
+        }
+        return null;
     }
 
     public boolean enrollStudent(String studentId) {
@@ -98,62 +106,104 @@ public class Course {
         return "APPROVED".equals(this.status);
     }
 
-    public Lesson getLessonById(String lessonId) {
-        for (Lesson lesson : lessons) {
-            if (String.valueOf(lesson.getLessonId()).equals(lessonId)) {
-                return lesson;
-            }
+    public List<QuizAttempt> getQuizAttempts() {
+        return quizAttempts;
+    }
+
+    public void addQuizAttempt(QuizAttempt attempt) {
+        if (quizAttempts == null) {
+            quizAttempts = new ArrayList<>();
         }
-        return null;
+        quizAttempts.add(attempt);
     }
 
-    public void updateCourse(Course c) {
-        if (c == null) return;
-        this.title = c.getTitle();
-        this.description = c.getDescription();
-        this.instructorId = c.getInstructorId();
-        this.lessons = c.getLessons();
-        this.enrolledStudents = c.getEnrolledStudents();
-        this.status = c.getStatus();
-        this.reviewedBy = c.getReviewedBy();
-        this.reviewDate = c.getReviewDate();
-        this.rejectionReason = c.getRejectionReason();
+    public String getCourseId() {
+        return courseId;
     }
 
-    public String getCourseId() { return courseId; }
-    public void setCourseId(String courseId) { this.courseId = courseId; }
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getInstructorId() { return instructorId; }
-    public void setInstructorId(String instructorId) { this.instructorId = instructorId; }
+    public String getDescription() {
+        return description;
+    }
 
-    public List<Lesson> getLessons() { return lessons; }
-    public void setLessons(List<Lesson> lessons) { this.lessons = lessons; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public List<String> getEnrolledStudents() { return enrolledStudents; }
-    public void setEnrolledStudents(List<String> enrolledStudents) { this.enrolledStudents = enrolledStudents; }
+    public String getInstructorId() {
+        return instructorId;
+    }
 
-    public List<String> getStudents() { return getEnrolledStudents(); }
+    public void setInstructorId(String instructorId) {
+        this.instructorId = instructorId;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
 
-    public String getCreatedDate() { return createdDate; }
-    public void setCreatedDate(String createdDate) { this.createdDate = createdDate; }
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
 
-    public String getReviewedBy() { return reviewedBy; }
-    public void setReviewedBy(String reviewedBy) { this.reviewedBy = reviewedBy; }
+    public List<String> getEnrolledStudents() {
+        return enrolledStudents;
+    }
 
-    public String getReviewDate() { return reviewDate; }
-    public void setReviewDate(String reviewDate) { this.reviewDate = reviewDate; }
+    public void setEnrolledStudents(List<String> enrolledStudents) {
+        this.enrolledStudents = enrolledStudents;
+    }
 
-    public String getRejectionReason() { return rejectionReason; }
-    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getReviewedBy() {
+        return reviewedBy;
+    }
+
+    public void setReviewedBy(String reviewedBy) {
+        this.reviewedBy = reviewedBy;
+    }
+
+    public String getReviewDate() {
+        return reviewDate;
+    }
+
+    public void setReviewDate(String reviewDate) {
+        this.reviewDate = reviewDate;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
 
     @Override
     public String toString() {
@@ -163,6 +213,7 @@ public class Course {
                 ", instructorId='" + instructorId + '\'' +
                 ", lessons=" + lessons.size() +
                 ", students=" + enrolledStudents.size() +
+                ", quizAttempts=" + quizAttempts.size() +
                 ", status=" + status +
                 '}';
     }

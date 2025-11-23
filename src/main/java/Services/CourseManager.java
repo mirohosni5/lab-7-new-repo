@@ -1,6 +1,7 @@
 package Services;
 
 import models.Course;
+import models.QuizAttempt;
 
 import java.util.*;
 

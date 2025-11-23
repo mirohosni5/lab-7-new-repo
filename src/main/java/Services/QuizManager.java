@@ -45,6 +45,11 @@ public class QuizManager {
 
         attempt.setScore(score);
 
+        double percent = (totalPoints == 0) ? 0 : (score * 100.0 / totalPoints);
+        attempt.setPassed(percent >= quiz.getPassPercent());
+
+        courseManager.addQuizAttemptForUser(attempt);
+        courseManager.addQuizAttemptForCourse(attempt);
 
     }
 }
