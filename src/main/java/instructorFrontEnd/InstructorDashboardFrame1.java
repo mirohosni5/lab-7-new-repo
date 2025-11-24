@@ -12,6 +12,11 @@ package instructorFrontEnd;
  * @author MAYAR
  */
 
+import java.awt.BorderLayout;
+import javax.swing.*;
+import instructorFrontEnd.QuizEditorPanel;
+
+
 
 
 import database.JsonUserDatabase;
@@ -485,7 +490,8 @@ private java.util.Map<String, Double> mapLessonKeysToTitles(java.util.Map<String
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnManageLessonsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageLessonsActionPerformed
-         int idx = jListCourses.getSelectedIndex();
+        
+    int idx = jListCourses.getSelectedIndex();
     if (idx < 0) {
         JOptionPane.showMessageDialog(this, "Select a course first.", "No selection", JOptionPane.INFORMATION_MESSAGE);
         return;
@@ -495,14 +501,14 @@ private java.util.Map<String, Double> mapLessonKeysToTitles(java.util.Map<String
 
     try {
         java.util.List<LessonManagerDialog.LessonData> initial = new java.util.ArrayList<>();
-        // If you want to prefill with existing backend lessons, you could load them here.
+        // open the lesson manager dialog (your existing dialog)
         LessonManagerDialog dlg = new LessonManagerDialog(this, true, selectedTitle, initial);
         dlg.setLocationRelativeTo(this);
         dlg.setVisible(true);
 
         java.util.List<LessonManagerDialog.LessonData> lessons = dlg.getLessons();
         if (lessons != null && !lessons.isEmpty()) {
-            
+
             if (courseIds == null || idx >= courseIds.size()) {
                 JOptionPane.showMessageDialog(this, "Course id missing; refresh list.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -510,40 +516,146 @@ private java.util.Map<String, Double> mapLessonKeysToTitles(java.util.Map<String
             String idStr = courseIds.get(idx);
             try {
                 int courseId = Integer.parseInt(idStr);
+                // save lessons to backend
                 for (LessonManagerDialog.LessonData ld : lessons) {
                     String lt = ld.getTitle();
                     String lc = ld.getContent() == null ? "" : ld.getContent();
-                    
                     lessonManager.addLesson(courseId, lt, lc);
                 }
-              
-                if (this.getClass().getDeclaredMethods() != null) { 
-                }
-                try {
-                    java.lang.reflect.Method m = this.getClass().getDeclaredMethod("refreshCourseList");
-                    m.setAccessible(true);
-                    m.invoke(this);
-                } catch (NoSuchMethodException ignore) {
-                    
-                }
+
+                // refresh UI
+                refreshCourseList();
                 JOptionPane.showMessageDialog(this,
                     "Saved " + lessons.size() + " lessons to backend for \"" + selectedTitle + "\".",
                     "Saved", JOptionPane.INFORMATION_MESSAGE);
+
+                // --- NEW: ask user if they want to open Quiz editor for one of the lessons ---
+                java.util.List<models.Lesson> backendLessons = lessonManager.getLessons(courseId);
+                if (backendLessons == null || backendLessons.isEmpty()) {
+                    // nothing to edit quizzes for
+                    return;
+                }
+
+                // build arrays for selection dialog (title -> lessonId)
+                String[] lessonTitles = new String[backendLessons.size()];
+                int[] lessonIds = new int[backendLessons.size()];
+                for (int i = 0; i < backendLessons.size(); i++) {
+                    models.Lesson L = backendLessons.get(i);
+                    lessonTitles[i] = (L.getTitle() == null || L.getTitle().isEmpty()) ? ("Lesson " + L.getLessonId()) : L.getTitle();
+                    lessonIds[i] = L.getLessonId();
+                }
+
+                int openQuiz = JOptionPane.showConfirmDialog(this,
+                        "Do you want to create/edit a Quiz for a lesson now?",
+                        "Open Quiz Editor",
+                        JOptionPane.YES_NO_OPTION);
+                if (openQuiz == JOptionPane.YES_OPTION) {
+                    String choice = (String) JOptionPane.showInputDialog(
+                            this,
+                            "Select lesson:",
+                            "Choose Lesson",
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            lessonTitles,
+                            lessonTitles[0]);
+                    if (choice != null) {
+                        // find the selected lessonId from title (first match)
+                        int chosenLessonId = -1;
+                        for (int i = 0; i < lessonTitles.length; i++) {
+                            if (lessonTitles[i].equals(choice)) {
+                                chosenLessonId = lessonIds[i];
+                                break;
+                            }
+                        }
+                        if (chosenLessonId >= 0) {
+                            // create QuizEditorPanel and show in a modal dialog
+                           // create QuizEditorPanel and show in a modal dialog
+QuizEditorPanel quizPanel = new QuizEditorPanel(lessonManager);
+quizPanel.setContext(courseId, chosenLessonId);
+
+JDialog qdlg = new JDialog(this, "Quiz Editor - " + choice, true);
+qdlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+qdlg.getContentPane().setLayout(new BorderLayout());
+qdlg.getContentPane().add(quizPanel, BorderLayout.CENTER);
+
+// optional: give some sensible size (adjust as you like)
+qdlg.setSize(700, 480);
+qdlg.setLocationRelativeTo(this);
+qdlg.setVisible(true);
+
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Failed to find selected lesson id.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(this, "Invalid course id: " + idStr, "Error", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                
                 JOptionPane.showMessageDialog(this, "Error saving lessons: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            
+            // user closed dialog or no lessons — optionally ask to open quiz editor for existing lessons
+            // we can still allow opening the quiz editor for existing lessons (no new lessons added)
+            if (courseIds == null || idx >= courseIds.size()) return;
+            String idStr = courseIds.get(idx);
+            int courseId;
+            try {
+                courseId = Integer.parseInt(idStr);
+            } catch (NumberFormatException ex) {
+                courseId = Math.abs(idStr.hashCode());
+            }
+            java.util.List<models.Lesson> backendLessons = lessonManager.getLessons(courseId);
+            if (backendLessons == null || backendLessons.isEmpty()) return;
+
+            int ask = JOptionPane.showConfirmDialog(this,
+                    "No new lessons were added. Do you want to edit quizzes for existing lessons?",
+                    "Edit Quizzes", JOptionPane.YES_NO_OPTION);
+            if (ask == JOptionPane.YES_OPTION) {
+                String[] lessonTitles = new String[backendLessons.size()];
+                int[] lessonIds = new int[backendLessons.size()];
+                for (int i = 0; i < backendLessons.size(); i++) {
+                    models.Lesson L = backendLessons.get(i);
+                    lessonTitles[i] = (L.getTitle() == null || L.getTitle().isEmpty()) ? ("Lesson " + L.getLessonId()) : L.getTitle();
+                    lessonIds[i] = L.getLessonId();
+                }
+                String choice = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Select lesson:",
+                        "Choose Lesson",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        lessonTitles,
+                        lessonTitles[0]);
+                if (choice != null) {
+                    int chosenLessonId = -1;
+                    for (int i = 0; i < lessonTitles.length; i++) {
+                        if (lessonTitles[i].equals(choice)) {
+                            chosenLessonId = lessonIds[i];
+                            break;
+                        }
+                    }
+                    if (chosenLessonId >= 0) {
+                        QuizEditorPanel quizPanel = new QuizEditorPanel(lessonManager);
+                        quizPanel.setContext(courseId, chosenLessonId);
+                        JDialog qdlg = new JDialog(this, "Quiz Editor - " + choice, true);
+                        qdlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                        qdlg.getContentPane().setLayout(new BorderLayout());
+                        qdlg.getContentPane().add(quizPanel, BorderLayout.CENTER);
+                        qdlg.setSize(700, 480);
+                        qdlg.setLocationRelativeTo(this);
+                        qdlg.setVisible(true);
+                    }
+                }
+            }
         }
     } catch (NoClassDefFoundError | Exception e) {
         JOptionPane.showMessageDialog(this,
             "Lesson manager not available in this build.\nYou can still add lessons later via backend tools.",
             "Not Implemented", JOptionPane.INFORMATION_MESSAGE);
-    
     }
+
+
     }//GEN-LAST:event_btnManageLessonsActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
