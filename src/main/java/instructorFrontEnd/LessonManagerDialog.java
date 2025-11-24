@@ -1,17 +1,5 @@
 package instructorFrontEnd;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author MAYAR
- */
-
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -19,13 +7,16 @@ import java.util.List;
 
 public class LessonManagerDialog extends JDialog {
     private JList<LessonData> jListLessons;
-    private JButton btnAdd, btnEdit, btnDelete, btnClose;
+    private JButton btnAdd, btnEdit, btnDelete, btnClose, btnEditQuiz;
     private DefaultListModel<LessonData> model;
-    private String courseTitle; 
+    private String courseTitle;
+    private int courseId;                 // NEW: store course id
+    private Services.LessonManager lessonManager = new Services.LessonManager();
 
-  
-    public LessonManagerDialog(Frame parent, boolean modal, String courseTitle, List<LessonData> initial) {
+    // Constructor now requires courseId
+    public LessonManagerDialog(Frame parent, boolean modal, int courseId, String courseTitle, List<LessonData> initial) {
         super(parent, modal);
+        this.courseId = courseId;
         this.courseTitle = courseTitle;
         initComponents();
         setLocationRelativeTo(parent);
@@ -52,25 +43,28 @@ public class LessonManagerDialog extends JDialog {
         btnEdit = new JButton("Edit");
         btnDelete = new JButton("Delete");
         btnClose = new JButton("Close");
+        btnEditQuiz = new JButton("Edit Quiz"); // NEW
 
         btnAdd.addActionListener(e -> onAdd());
         btnEdit.addActionListener(e -> onEdit());
         btnDelete.addActionListener(e -> onDelete());
         btnClose.addActionListener(e -> dispose());
+        btnEditQuiz.addActionListener(e -> onEditQuiz()); // NEW
 
         JScrollPane scroll = new JScrollPane(jListLessons);
 
-        JPanel btnPanel = new JPanel(new GridLayout(1, 4, 6, 6));
+        JPanel btnPanel = new JPanel(new GridLayout(1, 5, 6, 6));
         btnPanel.add(btnAdd);
         btnPanel.add(btnEdit);
         btnPanel.add(btnDelete);
+        btnPanel.add(btnEditQuiz); // NEW
         btnPanel.add(btnClose);
 
         setTitle("Manage Lessons - " + (courseTitle == null ? "" : courseTitle));
         setLayout(new BorderLayout(8, 8));
         add(scroll, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.SOUTH);
-        setSize(450, 300);
+        setSize(600, 360);
     }
 
     // --- actions ---
@@ -111,14 +105,44 @@ public class LessonManagerDialog extends JDialog {
         model.remove(idx);
     }
 
-    
+    // NEW: open the Quiz editor for the selected lesson
+    private void onEditQuiz() {
+        int idx = jListLessons.getSelectedIndex();
+        if (idx < 0) {
+            JOptionPane.showMessageDialog(this, "Select a lesson first.");
+            return;
+        }
+        LessonData selected = model.getElementAt(idx);
+
+        // Parse lesson id (your LessonData stores id as string)
+        int lessonId;
+        try {
+            lessonId = Integer.parseInt(selected.getId());
+        } catch (NumberFormatException nfe) {
+            // fallback: if ids are UUIDs/hashes, you need a different mapping
+            JOptionPane.showMessageDialog(this, "Invalid lesson id: " + selected.getId(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Create and show QuizEditorPanel inside a modal dialog
+        QuizEditorPanel quizPanel = new QuizEditorPanel(lessonManager);
+        quizPanel.setContext(courseId, lessonId); // load existing quiz if any
+
+        JDialog dlg = new JDialog((Frame) getOwner(), "Quiz Editor - " + selected.getTitle(), true);
+        dlg.setContentPane(quizPanel);
+        dlg.setSize(720, 520);
+        dlg.setLocationRelativeTo(this);
+        dlg.setVisible(true);
+
+        // When dialog closes, you could refresh lesson list (if quiz affects lesson display)
+    }
+
     public List<LessonData> getLessons() {
         List<LessonData> out = new ArrayList<>();
         for (int i = 0; i < model.size(); i++) out.add(model.getElementAt(i));
         return out;
     }
 
-    
     public static class LessonData {
         private String id;
         private String title;
@@ -137,6 +161,7 @@ public class LessonManagerDialog extends JDialog {
         @Override public String toString(){ return title == null ? "<no title>" : title; }
     }
 
+    // Inner editor dialog unchanged from your existing code
     private static class LessonEditorDialog extends JDialog {
         private JTextField txtTitle;
         private JTextArea txtContent;
