@@ -116,7 +116,7 @@ private CourseManager manager=new CourseManager();
         return;
     }
 
-    String courseId = selectedCourse.getCourseId();
+    int courseId = selectedCourse.getCourseId();
     String studentId = student.getUserId();
     boolean success = manager.enrollStudentInCourse(studentId, courseId);
     if (success) {
