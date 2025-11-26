@@ -11,11 +11,7 @@ public abstract class User {
     protected String username;
     protected String email;
     protected String passwordHash;
-
-    // قائمة محاولات الكويز الخاصة بالمستخدم
     protected List<QuizAttempt> quizAttempts = new ArrayList<>();
-
-    // قائمة الدروس المكتملة، كل عنصر "courseId::lessonId"
     protected List<String> completedLessons = new ArrayList<>();
 
     public User(String username, String email, String passwordHash, String role) {
