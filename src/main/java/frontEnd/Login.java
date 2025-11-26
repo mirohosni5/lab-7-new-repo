@@ -128,9 +128,9 @@ public class Login extends javax.swing.JFrame {
     JOptionPane.showMessageDialog(this, "Login Successful!");
     if (user.getRole().equals("Student")) {
         new StudentDashboardFrame().setVisible(true);
-    } else {
+    } else if (user.getRole().equals("Instructor")){
         new InstructorDashboardFrame1().setVisible(true);
-    }
+    }else { new AdminDashboardFrame().setVisible(true);}
     this.dispose(); 
     }//GEN-LAST:event_jButton1ActionPerformed
 
