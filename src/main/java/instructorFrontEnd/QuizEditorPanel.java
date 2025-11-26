@@ -37,9 +37,6 @@ public class QuizEditorPanel extends JPanel {
     private int courseId = -1;
     private int lessonId = -1;
 
-    public QuizEditorPanel(LessonManager lessonManager1) {
-        this(new LessonManager()); // default manager
-    }
 
     public QuizEditorPanel(LessonManager lessonManager) {
         this.lessonManager = lessonManager;
