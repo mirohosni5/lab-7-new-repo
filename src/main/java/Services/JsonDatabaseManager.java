@@ -37,23 +37,9 @@ public class JsonDatabaseManager {
         List<Course> courses = readCourses();
         for (Course c : courses) {
             if (String.valueOf(c.getCourseId()).equals(courseId)) {
-                return c;
-            }
-        }
+                return c;}}
         return null;
     }
-
-    public synchronized void addQuizAttemptForCourse(QuizAttempt attempt) {
-        List<Course> courses = readCourses();
-        for (Course c : courses) {
-            if (String.valueOf(c.getCourseId()).equals(attempt.getCourseId())) {
-                c.addQuizAttempt(attempt);
-                break;
-            }
-        }
-        writeCourses(courses);
-    }
-
     public static List<User> readUsers() {
         try (FileReader reader = new FileReader(USERS_FILE)) {
             Type listType = new TypeToken<List<User>>() {}.getType();
@@ -61,34 +47,21 @@ public class JsonDatabaseManager {
             return users == null ? new ArrayList<>() : users;
         } catch (IOException e) {
             return new ArrayList<>();
-        }
-    }
-
+        }}
     public static void writeUsers(List<User> users) {
         try (FileWriter writer = new FileWriter(USERS_FILE)) {
             gson.toJson(users, writer);
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized void addQuizAttemptForUser(QuizAttempt attempt) {
-        List<User> users = readUsers();
-        User user = null;
+            e.printStackTrace();}}
+     public synchronized void addQuizAttemptForUser(QuizAttempt attempt) {
+        database.JsonUserDatabase userDb = new database.JsonUserDatabase();
+        List<User> users = userDb.readUsersFromFile();
+        
         for (User u : users) {
             if (u.getUserId().equals(attempt.getStudentId())) {
-                user = u;
-                break;
-            }
-        }
-        if (user == null) {
-            user = new User(attempt.getStudentId());
-            users.add(user);
-        }
-        user.addQuizAttempt(attempt);
-        writeUsers(users);
-    }
-
+                u.addQuizAttempt(attempt);
+                userDb.writeUsersToFile(users);
+                return;}}}
     public synchronized void markLessonCompletedForUser(String studentId, String courseId, String lessonId) {
         List<User> users = readUsers();
         for (User u : users) {
@@ -99,6 +72,24 @@ public class JsonDatabaseManager {
         }
         writeUsers(users);
     }
+     public synchronized List<QuizAttempt> getQuizAttemptsByCourse(String courseId) {
+        List<QuizAttempt> attempts = new ArrayList<>();
+        database.JsonUserDatabase userDb = new database.JsonUserDatabase();
+        List<User> users = userDb.readUsersFromFile();
+        
+        for (User u : users) {
+            if (u.getQuizAttempts() != null) {
+                for (QuizAttempt attempt : u.getQuizAttempts()) {
+                    if (attempt.getCourseId().equals(courseId)) {
+                        attempts.add(attempt);
+                    }
+                }
+            }
+        }
+        
+        return attempts;
+    }
+    
 }
 
 
