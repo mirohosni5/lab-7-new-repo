@@ -116,7 +116,7 @@ public class ReviewCourses extends javax.swing.JPanel {
         return;
     }
     String id =(String)jTable1.getValueAt(row, 0);
-    Course c = manager.getCourseById(id);
+    Course c = manager.getCourseById(Integer.parseInt(id));
     c.setStatus("Rejected");
     manager.updateCourse(c);
     JOptionPane.showMessageDialog(this, "Course Rejected!");
