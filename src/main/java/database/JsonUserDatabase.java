@@ -11,6 +11,7 @@ package database;
 import models.User;
 import models.Student;
 import models.Instructor;
+import models.Admin;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -135,6 +136,11 @@ public class JsonUserDatabase {
         } else if (user instanceof Instructor) {
             Instructor instructor = (Instructor) user;
             jsonUser.put("createdCourses", new JSONArray(instructor.getCreatedCourses()));
+        }else if (user instanceof Admin) {
+            Admin admin = (Admin) user;
+            jsonUser.put("reviewedCourses", new JSONArray(admin.getReviewedCourses()));
+            jsonUser.put("totalApprovals", admin.getTotalApprovals());
+            jsonUser.put("totalRejections", admin.getTotalRejections());
         }
 
         return jsonUser;
@@ -177,6 +183,20 @@ public class JsonUserDatabase {
                 }
 
                 return new Instructor(userId, username, email, passwordHash, createdCourses);
+            }else if (role.equalsIgnoreCase("Admin")) {
+                List<String> reviewedCourses = new ArrayList<>();
+                if (jsonUser.has("reviewedCourses")) {
+                    JSONArray coursesArray = jsonUser.getJSONArray("reviewedCourses");
+                    for (int i = 0; i < coursesArray.length(); i++) {
+                        reviewedCourses.add(coursesArray.getString(i));
+                    }
+                }
+                
+                int totalApprovals = jsonUser.optInt("totalApprovals", 0);
+                int totalRejections = jsonUser.optInt("totalRejections", 0);
+                
+                return new Admin(userId, username, email, passwordHash, 
+                               reviewedCourses, totalApprovals, totalRejections);
             }
 
         } catch (Exception e) {
