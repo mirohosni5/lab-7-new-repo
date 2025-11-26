@@ -22,13 +22,23 @@ public class CourseManager {
     }
     
     
-   
+    
     public void updateCourse(int courseId, String newTitle, String newDescription) {
         List<Course> courses = JsonDatabaseManager.readCourses();
         for (Course c : courses) {
             if (c.getCourseId() == courseId) {  
                 c.setTitle(newTitle);
                 c.setDescription(newDescription);
+                break;
+            }
+        }
+        JsonDatabaseManager.writeCourses(courses);
+    }
+     public void updateCourse(Course course) {
+        List<Course> courses = JsonDatabaseManager.readCourses();
+        for (int i = 0; i < courses.size(); i++) {
+            if (courses.get(i).getCourseId() == course.getCourseId()) {
+                courses.set(i, course);
                 break;
             }
         }
@@ -91,7 +101,14 @@ public class CourseManager {
             }
         }
         return enrolledCourses;
-    }
-    
-}
-
+    }  
+    public List<Course> getPendingCourses() {
+        List<Course> courses = JsonDatabaseManager.readCourses();
+        List<Course> pending = new ArrayList<>();
+        for (Course c : courses) {
+            if ("PENDING".equals(c.getStatus())) {
+                pending.add(c);
+            }
+        }
+        return pending;
+    }}
