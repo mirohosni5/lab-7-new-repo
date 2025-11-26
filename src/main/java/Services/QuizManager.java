@@ -49,8 +49,6 @@ public class QuizManager {
         attempt.setPassed(percent >= quiz.getPassPercent());
 
         courseManager.addQuizAttemptForUser(attempt);
-        courseManager.addQuizAttemptForCourse(attempt);
-
         if (attempt.isPassed()) {
             courseManager.markLessonCompletedForUser(attempt.getStudentId(), attempt.getCourseId(), attempt.getLessonId());
         }
